@@ -6,13 +6,25 @@ const windowUrl = app.isPackaged
     : `http://localhost:3000`;
 
 let mainWindow;
+let interval;
+
 function createWindow() {
   mainWindow = new BrowserWindow({ 
     width: 800, 
-    height: 600 
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
   mainWindow.loadURL(windowUrl);
-  mainWindow.on(`closed`, () => (mainWindow = null));
+  mainWindow.on(`closed`, () => {
+      clearInterval(interval)
+      mainWindow = null
+  });
+  interval = setInterval(() => {
+    const msg = new Date().toLocaleTimeString()
+    mainWindow.webContents.send('TICK', msg)
+  }, 1000)
 }
 
 app.on(`ready`, createWindow);
